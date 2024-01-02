@@ -1,0 +1,8 @@
+<h1>result : "{{question}}"</h1>
+<ul>
+  {% for choice in choices %}
+  <li>{{choice.choice_text}} : {{choice.votes}}</li>
+  {% endfor %}
+</ul>
+
+<p><a href="{% url 'polls:detail' question.id %}">詳細に戻る</a></p>
