@@ -1,8 +1,9 @@
-from django.shortcuts import get_object_or_404, render
+from django import urls
+from django.shortcuts import get_object_or_404, redirect, render
 from django.http import HttpResponse
 from django.template import loader
 
-from polls.models import Question
+from polls.models import Question, Choice
 
 # Create your views here.
 
@@ -25,8 +26,23 @@ def detail(request, question_id):
 
 
 def vote(request, question_id):
-    pass
+    # questionと、それに紐づくchoiceリストを取得
+    question = get_object_or_404(Question, pk=question_id)
+
+    # Choiceのvotesを更新する
+    voted_choice = question.choice_set.get(pk=request.POST.get('choice'))
+    voted_choice.votes += 1
+    voted_choice.save()
+
+    # templateにデータを渡して、resultに処理を渡す
+    return redirect(urls.reverse('polls:results', args=[question_id]))
 
 
-def result(request, question_id):
-    pass
+def results(request, question_id):
+    question = Question.objects.get(pk=question_id)
+    choices = question.choice_set.all()
+    context = {
+        "question": question,
+        "choices": choices
+    }
+    return render(request, "polls/results.html", context)
